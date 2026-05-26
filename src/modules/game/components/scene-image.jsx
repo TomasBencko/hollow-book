@@ -1,4 +1,4 @@
-export default function SceneImage({ imageUrl, isLoading }) {
+export default function SceneImage({ imageUrl, isLoading, alt = 'Ilustrácia aktuálnej scény' }) {
   if (isLoading && !imageUrl) {
     return <div className="scene-image-skeleton" aria-hidden="true" />;
   }
@@ -11,7 +11,7 @@ export default function SceneImage({ imageUrl, isLoading }) {
     <img
       className="scene-image"
       src={imageUrl}
-      alt="Ilustrácia aktuálnej scény"
+      alt={alt}
     />
   );
 }

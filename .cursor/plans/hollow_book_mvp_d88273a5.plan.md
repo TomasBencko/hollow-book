@@ -121,13 +121,16 @@ sequenceDiagram
   U->>C: voľba / vlastný text
   C->>S: POST { history, stepsPlanned, theme, textLength, action: "choice", payload }
   Note over S,O: cyklus pokračuje až po win/gameover
+  C->>I: POST { prompt: scene.imagePrompt } (aj pri win/gameover)
+  I-->>C: { dataUrl }
+  C->>U: ending screen s ilustráciou
 ```
 
 ## Komponenty hlavných obrazoviek
 
 - **`menu.jsx`** — názov hry, výber témy (5 predvolieb + vlastná téma), dĺžka textov (stručné / štandardné / rozpísané), dĺžka hry (5 / 10 / 15 krokov), "Start" → `app.jsx` prepne na `game` s `GameSettings`.
 - **`game.jsx`** — riadi `useReducer` stav `{ stepsPlanned, currentScene, history, imageUrl, isLoading, rejection }`; prijíma `gameSettings` (theme, textLength, stepsPlanned). Po každej akcii: paralelne čaká na story aj (po prijatí) image; UI ukazuje skeleton pre obrázok kým sa nahráva.
-- **`win-screen.jsx` / `game-over-screen.jsx`** — krátky záverečný text z poslednej scény + "Play again" → reset do menu.
+- **`win-screen.jsx` / `game-over-screen.jsx`** — ilustrácia z `imagePrompt` poslednej scény (`SceneImage`), záverečný text + "Play again" → reset do menu.
 
 ## Netlify Functions — kľúčové body
 

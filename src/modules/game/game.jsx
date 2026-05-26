@@ -24,7 +24,7 @@ export default function Game({ gameSettings, onEnd, onError }) {
 
     const nextScreen = getScreenFromScene(scene);
     if (nextScreen !== 'game') {
-      onEnd(nextScreen, scene);
+      onEnd(nextScreen, scene, imageUrl);
     }
   }, [onEnd]);
 

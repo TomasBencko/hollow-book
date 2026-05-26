@@ -9,23 +9,23 @@ import { SCREENS } from './modules/game/game.types.js';
 export default function App() {
   const [screen, setScreen] = useState(SCREENS.MENU);
   const [gameSettings, setGameSettings] = useState(null);
-  const [endingScene, setEndingScene] = useState(null);
+  const [ending, setEnding] = useState(null);
   const [gameKey, setGameKey] = useState(0);
 
   const handleStart = useCallback((settings) => {
     setGameSettings(settings);
-    setEndingScene(null);
+    setEnding(null);
     setGameKey((key) => key + 1);
     setScreen(SCREENS.GAME);
   }, []);
 
-  const handleEnd = useCallback((nextScreen, scene) => {
-    setEndingScene(scene);
+  const handleEnd = useCallback((nextScreen, scene, imageUrl) => {
+    setEnding({ scene, imageUrl });
     setScreen(nextScreen);
   }, []);
 
   const handlePlayAgain = useCallback(() => {
-    setEndingScene(null);
+    setEnding(null);
     setScreen(SCREENS.MENU);
   }, []);
 
@@ -42,11 +42,11 @@ export default function App() {
       )}
 
       {screen === SCREENS.WIN && (
-        <WinScreen scene={endingScene} onPlayAgain={handlePlayAgain} />
+        <WinScreen scene={ending?.scene} imageUrl={ending?.imageUrl} onPlayAgain={handlePlayAgain} />
       )}
 
       {screen === SCREENS.GAMEOVER && (
-        <GameOverScreen scene={endingScene} onPlayAgain={handlePlayAgain} />
+        <GameOverScreen scene={ending?.scene} imageUrl={ending?.imageUrl} onPlayAgain={handlePlayAgain} />
       )}
     </div>
   );
