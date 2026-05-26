@@ -1,32 +1,34 @@
 # Hollow Book
 
-Interaktívna gamebook hra s AI-generovaným príbehom a ilustráciami.
+Interaktívna gamebook hra s AI príbehom a ilustráciami. Vyberieš tému a štýl, potom hráš voľbami alebo vlastným textom — príbeh a obrázky generuje OpenAI na pozadí.
 
-## Stack
+## Požiadavky
 
-- React + Vite (JS)
-- Netlify Functions + OpenAI SDK
-- Modely: `gpt-4o-mini` (príbeh), `gpt-image-1` (ilustrácie, low quality)
+- Node.js 20+
+- [OpenAI API kľúč](https://platform.openai.com/api-keys)
 
-## Lokálny vývoj
+## Spustenie lokálne
 
 ```bash
 npm install
-cp .env.example .env   # dopln OPENAI_API_KEY
-npm run dev            # frontend + functions na :5173
+cp .env.example .env
 ```
 
-Vite dev server cez vlastný middleware (`vite.config.js`) lokálne emuluje Netlify Functions na `/api/*`, takže netreba `netlify dev`. V produkcii funkcie obsluhuje Netlify natívne podľa `netlify.toml`.
+Do `.env` doplň `OPENAI_API_KEY=sk-...`, potom:
 
-## Deploy
+```bash
+npm run build   # voliteľné; dev funguje aj bez buildu
+npm run dev
+```
 
-1. Push na GitHub, pripoj repo v Netlify
-2. Nastav env `OPENAI_API_KEY` v Netlify dashboard
-3. Build: `npm run build`, publish: `dist`
+Otvor [http://localhost:5173](http://localhost:5173). Vite cez middleware obsluhuje `/api/story` a `/api/image` — netreba `netlify dev`.
 
-## API
+## Deploy na Netlify
 
-- `POST /api/story` — generovanie scény (structured JSON)
-- `POST /api/image` — generovanie ilustrácie (base64 PNG)
+1. Push repozitára, pripoj v Netlify.
+2. V dashboard → Environment variables nastav `OPENAI_API_KEY`.
+3. Build command: `npm run build`, publish directory: `dist` (už v `netlify.toml`).
 
-Kľúč OpenAI je len server-side v Netlify Functions.
+## Ďalšie info
+
+Technický prehľad architektúry a API: [docs/overview.md](docs/overview.md).
