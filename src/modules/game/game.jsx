@@ -6,7 +6,7 @@ import LoadingIndicator from './components/loading-indicator.jsx';
 import SceneChoices from './components/scene-choices.jsx';
 import SceneImage from './components/scene-image.jsx';
 import SceneInput from './components/scene-input.jsx';
-import { appendToHistory, submitChoice } from './game.service.js';
+import { appendToHistory, loadSceneImage, submitChoice } from './game.service.js';
 import { GAME_STATE_ACTIONS, gameReducer, getScreenFromScene, initialGameState } from './game.state.js';
 
 export default function Game({ gameSettings, initialState, onEnd }) {
@@ -24,6 +24,24 @@ export default function Game({ gameSettings, initialState, onEnd }) {
   const isInteractionLocked = state.isLoading || pendingSelection !== null;
 
   useEffect(() => {
+    const scene = state.currentScene;
+    if (!scene?.imagePrompt) return undefined;
+
+    let cancelled = false;
+    dispatch({ type: GAME_STATE_ACTIONS.SET_IMAGE_LOADING, payload: true });
+
+    loadSceneImage(scene).then((imageUrl) => {
+      if (!cancelled) {
+        dispatch({ type: GAME_STATE_ACTIONS.SET_IMAGE, payload: { imageUrl } });
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [state.currentScene?.stepNumber, state.currentScene?.imagePrompt]);
+
+  useEffect(() => {
     const stepNumber = state.currentScene?.stepNumber;
     if (stepNumber == null || stepNumber === lastStepRef.current) return;
 
@@ -32,17 +50,19 @@ export default function Game({ gameSettings, initialState, onEnd }) {
     setPendingSelection(null);
   }, [state.currentScene?.stepNumber]);
 
-  const handleSceneResult = useCallback((scene, imageUrl, history, rejection = null) => {
+  const handleSceneResult = useCallback((scene, history, rejection = null) => {
     dispatch({
       type: GAME_STATE_ACTIONS.SET_SCENE,
-      payload: { scene, imageUrl, history, rejection },
+      payload: { scene, imageUrl: null, history, rejection },
     });
 
     const nextScreen = getScreenFromScene(scene);
     if (nextScreen !== 'game') {
-      onEnd(nextScreen, scene, imageUrl);
+      return nextScreen;
     }
-  }, [onEnd]);
+
+    return null;
+  }, []);
 
   const handleChoice = useCallback(async (payload, source = 'choice') => {
     if (submittingRef.current || !state.currentScene) return;
@@ -58,7 +78,7 @@ export default function Game({ gameSettings, initialState, onEnd }) {
     };
 
     try {
-      const { scene, imageUrl } = await submitChoice(state.history, activeSettings, payload);
+      const { scene } = await submitChoice(state.history, activeSettings, payload);
 
       if (scene.status === 'rejected') {
         setPendingSelection(null);
@@ -75,14 +95,23 @@ export default function Game({ gameSettings, initialState, onEnd }) {
       }
 
       const history = appendToHistory(state.history, payload, scene);
-      handleSceneResult(scene, imageUrl, history);
+      const nextScreen = handleSceneResult(scene, history);
+
+      if (nextScreen) {
+        setPendingSelection(null);
+        const imageUrl = await loadSceneImage(scene);
+        onEnd(nextScreen, scene, imageUrl);
+        return;
+      }
+
+      setPendingSelection(null);
     } catch (error) {
       setPendingSelection(null);
       dispatch({ type: GAME_STATE_ACTIONS.SET_ERROR, payload: error.message });
     } finally {
       submittingRef.current = false;
     }
-  }, [state.currentScene, state.history, state.imageUrl, gameSettings, handleSceneResult]);
+  }, [state.currentScene, state.history, state.imageUrl, gameSettings, handleSceneResult, onEnd]);
 
   const handlePresetChoice = useCallback((label) => {
     handleChoice(label, 'choice');
@@ -102,7 +131,7 @@ export default function Game({ gameSettings, initialState, onEnd }) {
 
       <div className="game-layout">
         <div className="game-image-col">
-          <SceneImage imageUrl={state.imageUrl} isLoading={state.isLoading} />
+          <SceneImage imageUrl={state.imageUrl} isLoading={state.isImageLoading} />
         </div>
 
         <div className="game-content-col" key={scene.stepNumber}>

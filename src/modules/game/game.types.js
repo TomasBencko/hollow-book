@@ -33,6 +33,7 @@
  * @property {HistoryEntry[]} history
  * @property {string|null} imageUrl
  * @property {boolean} isLoading
+ * @property {boolean} isImageLoading
  * @property {string|null} rejection
  * @property {string|null} error
  */

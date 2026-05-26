@@ -7,6 +7,7 @@ export const initialGameState = {
   history: [],
   imageUrl: null,
   isLoading: false,
+  isImageLoading: false,
   rejection: null,
   error: null,
 };
@@ -14,6 +15,8 @@ export const initialGameState = {
 export const GAME_STATE_ACTIONS = {
   SET_LOADING: 'SET_LOADING',
   SET_SCENE: 'SET_SCENE',
+  SET_IMAGE: 'SET_IMAGE',
+  SET_IMAGE_LOADING: 'SET_IMAGE_LOADING',
   SET_REJECTION: 'SET_REJECTION',
   SET_ERROR: 'SET_ERROR',
   RESET: 'RESET',
@@ -28,11 +31,24 @@ export function gameReducer(state, action) {
       return {
         ...state,
         currentScene: action.payload.scene,
-        imageUrl: action.payload.imageUrl ?? state.imageUrl,
+        imageUrl: 'imageUrl' in action.payload ? action.payload.imageUrl : state.imageUrl,
         history: action.payload.history ?? state.history,
         isLoading: false,
         rejection: action.payload.rejection ?? null,
         error: null,
+      };
+
+    case GAME_STATE_ACTIONS.SET_IMAGE:
+      return {
+        ...state,
+        imageUrl: action.payload.imageUrl,
+        isImageLoading: false,
+      };
+
+    case GAME_STATE_ACTIONS.SET_IMAGE_LOADING:
+      return {
+        ...state,
+        isImageLoading: action.payload,
       };
 
     case GAME_STATE_ACTIONS.SET_REJECTION:

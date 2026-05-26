@@ -113,13 +113,18 @@ sequenceDiagram
   S->>O: chat.completions (json_schema)
   O-->>S: Scene JSON
   S-->>C: Scene JSON
+  C->>U: render textu scény (obrázok = skeleton)
   C->>I: POST { prompt: scene.imagePrompt }
   I->>O: images.generate (gpt-image-1, low)
   O-->>I: base64 PNG
   I-->>C: { dataUrl }
-  C->>U: render scény
+  C->>U: zobrazí ilustráciu
   U->>C: voľba / vlastný text
   C->>S: POST { history, stepsPlanned, theme, textLength, action: "choice", payload }
+  S->>O: chat.completions (json_schema)
+  O-->>S: Scene JSON
+  S-->>C: Scene JSON
+  C->>U: render textu novej scény (obrázok = skeleton)
   Note over S,O: cyklus pokračuje až po win/gameover
   C->>I: POST { prompt: scene.imagePrompt } (aj pri win/gameover)
   I-->>C: { dataUrl }
@@ -129,8 +134,8 @@ sequenceDiagram
 ## Komponenty hlavných obrazoviek
 
 - **`menu.jsx`** — názov hry, výber témy ako klikateľné karty (5 predvolieb + vlastná téma), dĺžka textov ako segment/pill toggle, dĺžka hry ako segment/pill toggle (Rýchla / Stredná / Dlhá hra — bez uvedenia počtu krokov), "Otvoriť príbeh" → `app.jsx` spustí `startGame` z click handlera (nie `useEffect` — vyhne sa dvojitému volaniu v React Strict Mode).
-- **`app.jsx`** — pri štarte volá `startGame`, zobrazí loading, potom mountne `Game` s `initialState` alebo rovno ending screen.
-- **`game.jsx`** — riadi `useReducer` stav od `initialState`; na desktope (≥900px) **split layout**: sticky obrázok vľavo, scrollovateľný obsah vpravo; bez progress baru / počítadla krokov. Na mobile stĺpcový layout. Po každej akcii: čaká na story aj image; UI ukazuje animovaný skeleton pre obrázok kým sa nahráva. Počas čakania na AI zostávajú voľby a input viditeľné (disabled), vybraná možnosť zvýraznená, vlastný text sa nemaže až do prepnutia scény; pod akciami codex loading animácia s rotujúcimi textami.
+- **`app.jsx`** — pri štarte volá `startGame` (iba story), zobrazí loading počas story requestu, potom mountne `Game` s textom prvej scény (`imageUrl: null`); ilustrácia sa doťahuje asynchrónne v `Game`.
+- **`game.jsx`** — riadi `useReducer` stav od `initialState`; na desktope (≥900px) **split layout**: sticky obrázok vľavo, scrollovateľný obsah vpravo; bez progress baru / počítadla krokov. Na mobile stĺpcový layout. Po story requeste sa text a voľby zobrazia hneď; `useEffect` spustí image request a skeleton animáciu kým sa ilustrácia nenačíta. Počas čakania na story zostávajú voľby a input viditeľné (disabled), vybraná možnosť zvýraznená, vlastný text sa nemaže až do prepnutia scény; pod akciami codex loading animácia s rotujúcimi textami.
 - **`win-screen.jsx` / `game-over-screen.jsx`** — ilustrácia z `imagePrompt` poslednej scény (`SceneImage`), záverečný text + "Play again" → reset do menu.
 
 ## Netlify Functions — kľúčové body

@@ -19,42 +19,36 @@ export async function fetchImage(prompt) {
 
 /**
  * @param {import('./game.types.js').GameSettings} gameSettings
- * @returns {Promise<{ scene: import('./game.types.js').Scene, imageUrl: string|null }>}
+ * @returns {Promise<{ scene: import('./game.types.js').Scene }>}
  */
 export async function startGame(gameSettings) {
-  const { scene } = await fetchStory({
+  return fetchStory({
     action: GAME_ACTIONS.START,
     ...gameSettings,
     history: [],
   });
-
-  const imageUrl = await loadSceneImage(scene);
-  return { scene, imageUrl };
 }
 
 /**
  * @param {import('./game.types.js').HistoryEntry[]} history
  * @param {import('./game.types.js').GameSettings} gameSettings
  * @param {string} payload
- * @returns {Promise<{ scene: import('./game.types.js').Scene, imageUrl: string|null }>}
+ * @returns {Promise<{ scene: import('./game.types.js').Scene }>}
  */
 export async function submitChoice(history, gameSettings, payload) {
-  const { scene } = await fetchStory({
+  return fetchStory({
     action: GAME_ACTIONS.CHOICE,
     ...gameSettings,
     history,
     payload,
   });
-
-  const imageUrl = scene.status === 'rejected' ? null : await loadSceneImage(scene);
-  return { scene, imageUrl };
 }
 
 /**
  * @param {import('./game.types.js').Scene} scene
  * @returns {Promise<string|null>}
  */
-async function loadSceneImage(scene) {
+export async function loadSceneImage(scene) {
   if (!scene.imagePrompt) return null;
 
   try {
