@@ -66,6 +66,15 @@ const TEXT_LENGTH_GUIDE = {
   detailed: 'Rozpísané texty: sceneNarrative 2-3 odseky s bohatými detailmi, choice labels môžu byť dlhšie.',
 };
 
+const MARKDOWN_FORMAT_GUIDE = `
+Formatting (Markdown subset — client renders it):
+- sceneNarrative: split into paragraphs with a blank line (\\n\\n) between them.
+- Use **bold** for key objects, sounds, actions, or dramatic beats.
+- Use *italic* for inner thoughts, whispers, emphasis, or atmospheric details.
+- choice labels: short inline **bold** or *italic* is OK when it helps clarity; keep labels scannable.
+- rejectionReason: one short paragraph; *italic* or **bold** sparingly for tone.
+- Do not use headings, links, lists, or HTML tags — only paragraphs, **bold**, and *italic*.`;
+
 export function buildSystemPrompt(stepsPlanned, stepNumber, theme, textLength) {
   const isNearEnd = stepNumber >= stepsPlanned - 1;
   const lengthGuide = TEXT_LENGTH_GUIDE[textLength] ?? TEXT_LENGTH_GUIDE.standard;
@@ -82,6 +91,7 @@ ${isNearEnd ? '- You are near the end. Begin steering toward a natural conclusio
 
 Narrative length:
 - ${lengthGuide}
+${MARKDOWN_FORMAT_GUIDE}
 
 Rules:
 - Return structured JSON matching the schema exactly.

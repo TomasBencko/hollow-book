@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useReducer } from 'react';
 
+import FormattedText from '../../shared/formatted-text.jsx';
+
 import LoadingIndicator from './components/loading-indicator.jsx';
 import SceneChoices from './components/scene-choices.jsx';
 import SceneImage from './components/scene-image.jsx';
@@ -25,19 +27,6 @@ export default function Game({ gameSettings, onEnd, onError }) {
       onEnd(nextScreen, scene);
     }
   }, [onEnd]);
-
-  const runStart = useCallback(async () => {
-    dispatch({ type: GAME_STATE_ACTIONS.SET_LOADING, payload: true });
-
-    try {
-      const { scene, imageUrl } = await startGame(gameSettings);
-      const history = appendToHistory([], 'Začni novú hru.', scene);
-      handleSceneResult(scene, imageUrl, history);
-    } catch (error) {
-      dispatch({ type: GAME_STATE_ACTIONS.SET_ERROR, payload: error.message });
-      onError?.(error.message);
-    }
-  }, [gameSettings, handleSceneResult, onError]);
 
   const handleChoice = useCallback(async (payload) => {
     if (state.isLoading || !state.currentScene) return;
@@ -69,10 +58,28 @@ export default function Game({ gameSettings, onEnd, onError }) {
   }, [state.isLoading, state.currentScene, state.history, state.imageUrl, gameSettings, handleSceneResult]);
 
   useEffect(() => {
-    if (!state.currentScene) {
-      runStart();
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    let cancelled = false;
+
+    (async () => {
+      dispatch({ type: GAME_STATE_ACTIONS.SET_LOADING, payload: true });
+
+      try {
+        const { scene, imageUrl } = await startGame(gameSettings);
+        if (cancelled) return;
+
+        const history = appendToHistory([], 'Začni novú hru.', scene);
+        handleSceneResult(scene, imageUrl, history);
+      } catch (error) {
+        if (cancelled) return;
+        dispatch({ type: GAME_STATE_ACTIONS.SET_ERROR, payload: error.message });
+        onError?.(error.message);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [gameSettings, handleSceneResult, onError]);
 
   const scene = state.currentScene;
 
@@ -94,11 +101,11 @@ export default function Game({ gameSettings, onEnd, onError }) {
       <SceneImage imageUrl={state.imageUrl} isLoading={state.isLoading} />
 
       <h2 className="scene-title">{scene.sceneTitle}</h2>
-      <p className="scene-narrative">{scene.sceneNarrative}</p>
+      <FormattedText text={scene.sceneNarrative} className="scene-narrative" />
 
       {state.rejection && (
         <div className="rejection-banner" role="alert">
-          {state.rejection}
+          <FormattedText text={state.rejection} inline />
         </div>
       )}
 

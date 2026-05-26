@@ -46,6 +46,15 @@ body {
   color: #a8a6a3;
 }
 
+.screen-subtitle strong {
+  color: #e8e6e3;
+  font-weight: 600;
+}
+
+.screen-subtitle em {
+  font-style: italic;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -207,6 +216,45 @@ body {
   color: #c8c6c3;
 }
 
+.formatted-text {
+  line-height: 1.75;
+}
+
+.formatted-text p {
+  margin: 0 0 1rem;
+}
+
+.formatted-text p:last-child {
+  margin-bottom: 0;
+}
+
+.formatted-text strong {
+  color: #f0eeeb;
+  font-weight: 600;
+}
+
+.formatted-text em {
+  color: #d4d0cb;
+  font-style: italic;
+}
+
+.scene-narrative.formatted-text {
+  font-size: 1.0625rem;
+}
+
+.ending-text.formatted-text {
+  font-size: 1.125rem;
+}
+
+.ending-text.formatted-text p {
+  margin-bottom: 1.25rem;
+}
+
+.rejection-banner .formatted-text em,
+.rejection-banner .formatted-text strong {
+  color: inherit;
+}
+
 .scene-choices {
   margin-bottom: 1.5rem;
 }
@@ -267,7 +315,6 @@ body {
 
 .ending-text {
   margin: 0 0 2rem;
-  font-size: 1.125rem;
   color: #c8c6c3;
 }
 

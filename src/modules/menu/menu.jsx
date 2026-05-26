@@ -28,7 +28,7 @@ export default function Menu({ onStart }) {
     <div className="screen">
       <h1 className="screen-title">Hollow Book</h1>
       <p className="screen-subtitle">
-        Interaktívna gamebook hra. Každá voľba mení príbeh — a ilustráciu.
+        Interaktívna <strong>gamebook</strong> hra. Každá voľba mení <em>príbeh</em> — a ilustráciu.
       </p>
 
       <div className="form-group">

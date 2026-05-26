@@ -1,3 +1,5 @@
+import FormattedText from '../../../shared/formatted-text.jsx';
+
 export default function SceneChoices({ choices, onChoice, disabled }) {
   if (!choices?.length) return null;
 
@@ -11,7 +13,7 @@ export default function SceneChoices({ choices, onChoice, disabled }) {
           onClick={() => onChoice(choice.label)}
           disabled={disabled}
         >
-          {choice.label}
+          <FormattedText text={choice.label} inline />
         </button>
       ))}
     </div>

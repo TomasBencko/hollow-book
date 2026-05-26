@@ -56,6 +56,7 @@ isProject: false
       game-over-screen.jsx
   shared/
     api-client.js       # tenká fetch obálka, error handling
+    formatted-text.jsx  # render Markdown subset (**bold**, *italic*, odseky)
   styles/
     base.css            # minimal, čistá typografia (dizajn neskôr)
 netlify.toml            # functions dir, redirects, node version
@@ -72,7 +73,7 @@ JSON schema poslaná v `response_format` (Netlify Function ju validuje pred odos
 {
   "status": "ongoing | win | gameover | rejected",
   "sceneTitle": "string",
-  "sceneNarrative": "string",         // popis scény pod obrázkom
+  "sceneNarrative": "string",         // popis scény; Markdown: odseky (\\n\\n), **bold**, *italic*
   "imagePrompt": "string",            // krátky vizuálny prompt pre gpt-image-1
   "choices": [                        // 2-3 položky; prázdne pole pri win/gameover/rejected
     { "id": "a", "label": "string" }
@@ -92,6 +93,7 @@ JSON schema poslaná v `response_format` (Netlify Function ju validuje pred odos
 - Vystupuje ako narrator gamebook hry, druhá osoba, atmosférický štýl.
 - Dostane `theme` (predpripravená alebo vlastná téma z menu), `textLength` (`concise` | `standard` | `detailed`) a herné parametre `stepsPlanned` / `stepNumber`.
 - Dĺžka textov: stručné (2–4 vety), štandardné (1–2 odseky), rozpísané (2–3 odseky); platí pre `sceneNarrative` aj štýl `choices`.
+- `sceneNarrative` a `choices.label` používajú jednoduchý Markdown: odseky oddelené prázdnym riadkom, **tučné** pre dôležité detaily, *kurzíva* pre myšlienky a atmosféru. Klient renderuje cez `formatted-text.jsx`.
 - Má **prirodzene gradovať** k záveru tak, aby do `stepsPlanned ± 1` mohol vrátiť `win` alebo `gameover`. Nesmie ukončovať násilne.
 - Zlé voľby hráča môžu viesť ku `gameover` skôr; nezmyselné odpovede (gibberish, mimo kontext) → `status: "rejected"` s vysvetlením.
 - `imagePrompt` má byť 1-2 vety, vizuálny štýl konzistentný s zvolenou témou.
@@ -153,7 +155,7 @@ sequenceDiagram
 
 ## Dizajn (zámerne minimal pre MVP)
 
-- Jeden `base.css`, system font stack, tmavšie pozadie, vzdušné spacing, max-width container ~720px, jemné prechody. Vracia sa k tomu neskôr.
+- Jeden `base.css`, system font stack, tmavšie pozadie, vzdušné spacing, max-width container ~720px, jemné prechody. Narratívne texty: odseky, **bold**, *italic* cez `FormattedText`. Vracia sa k tomu neskôr.
 
 ## Mimo rozsahu MVP
 
