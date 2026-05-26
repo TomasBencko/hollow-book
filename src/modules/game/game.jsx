@@ -27,17 +27,17 @@ export default function Game({ gameSettings, initialState, onEnd }) {
     const scene = state.currentScene;
     if (!scene?.imagePrompt) return undefined;
 
-    let cancelled = false;
+    const controller = new AbortController();
     dispatch({ type: GAME_STATE_ACTIONS.SET_IMAGE_LOADING, payload: true });
 
-    loadSceneImage(scene).then((imageUrl) => {
-      if (!cancelled) {
+    loadSceneImage(scene, { signal: controller.signal }).then((imageUrl) => {
+      if (!controller.signal.aborted) {
         dispatch({ type: GAME_STATE_ACTIONS.SET_IMAGE, payload: { imageUrl } });
       }
     });
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [state.currentScene?.stepNumber, state.currentScene?.imagePrompt]);
 
@@ -95,15 +95,16 @@ export default function Game({ gameSettings, initialState, onEnd }) {
       }
 
       const history = appendToHistory(state.history, payload, scene);
-      const nextScreen = handleSceneResult(scene, history);
+      const nextScreen = getScreenFromScene(scene);
 
-      if (nextScreen) {
-        setPendingSelection(null);
+      if (nextScreen !== 'game') {
         const imageUrl = await loadSceneImage(scene);
+        setPendingSelection(null);
         onEnd(nextScreen, scene, imageUrl);
         return;
       }
 
+      handleSceneResult(scene, history);
       setPendingSelection(null);
     } catch (error) {
       setPendingSelection(null);
