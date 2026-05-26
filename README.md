@@ -13,11 +13,10 @@ Interaktívna gamebook hra s AI-generovaným príbehom a ilustráciami.
 ```bash
 npm install
 cp .env.example .env   # dopln OPENAI_API_KEY
-npm run dev            # frontend na :5173
-npm run dev:full       # frontend + functions (odporúčané)
+npm run dev            # frontend + functions na :5173
 ```
 
-Bez `netlify dev` frontend beží, ale API volania zlyhajú — functions vyžadujú Netlify runtime.
+Vite dev server cez vlastný middleware (`vite.config.js`) lokálne emuluje Netlify Functions na `/api/*`, takže netreba `netlify dev`. V produkcii funkcie obsluhuje Netlify natívne podľa `netlify.toml`.
 
 ## Deploy
 

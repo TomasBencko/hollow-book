@@ -2,7 +2,7 @@ import { apiPost } from '../../shared/api-client.js';
 import { GAME_ACTIONS } from './game.types.js';
 
 /**
- * @param {{ action: string, stepsPlanned: number, history?: import('./game.types.js').HistoryEntry[], payload?: string }} params
+ * @param {{ action: string, stepsPlanned: number, theme: string, textLength: import('./game.types.js').TextLength, history?: import('./game.types.js').HistoryEntry[], payload?: string }} params
  * @returns {Promise<{ scene: import('./game.types.js').Scene }>}
  */
 export async function fetchStory(params) {
@@ -18,13 +18,13 @@ export async function fetchImage(prompt) {
 }
 
 /**
- * @param {number} stepsPlanned
+ * @param {import('./game.types.js').GameSettings} gameSettings
  * @returns {Promise<{ scene: import('./game.types.js').Scene, imageUrl: string|null }>}
  */
-export async function startGame(stepsPlanned) {
+export async function startGame(gameSettings) {
   const { scene } = await fetchStory({
     action: GAME_ACTIONS.START,
-    stepsPlanned,
+    ...gameSettings,
     history: [],
   });
 
@@ -34,14 +34,14 @@ export async function startGame(stepsPlanned) {
 
 /**
  * @param {import('./game.types.js').HistoryEntry[]} history
- * @param {number} stepsPlanned
+ * @param {import('./game.types.js').GameSettings} gameSettings
  * @param {string} payload
  * @returns {Promise<{ scene: import('./game.types.js').Scene, imageUrl: string|null }>}
  */
-export async function submitChoice(history, stepsPlanned, payload) {
+export async function submitChoice(history, gameSettings, payload) {
   const { scene } = await fetchStory({
     action: GAME_ACTIONS.CHOICE,
-    stepsPlanned,
+    ...gameSettings,
     history,
     payload,
   });

@@ -7,10 +7,10 @@ import SceneInput from './components/scene-input.jsx';
 import { appendToHistory, startGame, submitChoice } from './game.service.js';
 import { GAME_STATE_ACTIONS, gameReducer, getScreenFromScene, initialGameState } from './game.state.js';
 
-export default function Game({ stepsPlanned, onEnd, onError }) {
+export default function Game({ gameSettings, onEnd, onError }) {
   const [state, dispatch] = useReducer(gameReducer, {
     ...initialGameState,
-    stepsPlanned,
+    stepsPlanned: gameSettings.stepsPlanned,
     isLoading: true,
   });
 
@@ -30,14 +30,14 @@ export default function Game({ stepsPlanned, onEnd, onError }) {
     dispatch({ type: GAME_STATE_ACTIONS.SET_LOADING, payload: true });
 
     try {
-      const { scene, imageUrl } = await startGame(stepsPlanned);
+      const { scene, imageUrl } = await startGame(gameSettings);
       const history = appendToHistory([], 'Začni novú hru.', scene);
       handleSceneResult(scene, imageUrl, history);
     } catch (error) {
       dispatch({ type: GAME_STATE_ACTIONS.SET_ERROR, payload: error.message });
       onError?.(error.message);
     }
-  }, [stepsPlanned, handleSceneResult, onError]);
+  }, [gameSettings, handleSceneResult, onError]);
 
   const handleChoice = useCallback(async (payload) => {
     if (state.isLoading || !state.currentScene) return;
@@ -46,7 +46,7 @@ export default function Game({ stepsPlanned, onEnd, onError }) {
     dispatch({ type: GAME_STATE_ACTIONS.SET_REJECTION, payload: null });
 
     try {
-      const { scene, imageUrl } = await submitChoice(state.history, stepsPlanned, payload);
+      const { scene, imageUrl } = await submitChoice(state.history, gameSettings, payload);
 
       if (scene.status === 'rejected') {
         dispatch({
@@ -66,7 +66,7 @@ export default function Game({ stepsPlanned, onEnd, onError }) {
     } catch (error) {
       dispatch({ type: GAME_STATE_ACTIONS.SET_ERROR, payload: error.message });
     }
-  }, [state.isLoading, state.currentScene, state.history, state.imageUrl, stepsPlanned, handleSceneResult]);
+  }, [state.isLoading, state.currentScene, state.history, state.imageUrl, gameSettings, handleSceneResult]);
 
   useEffect(() => {
     if (!state.currentScene) {

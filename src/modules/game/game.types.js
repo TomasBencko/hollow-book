@@ -50,3 +50,68 @@ export const SCREENS = {
 };
 
 export const STEP_OPTIONS = [5, 10, 15];
+
+export const THEME_CUSTOM_ID = 'custom';
+
+export const THEME_PRESETS = [
+  {
+    id: 'dark-fantasy',
+    label: 'Temná fantasy',
+    prompt: 'Temná fantasy: mystické ruiny, mágia, stredoveká atmosféra, nebezpečenstvo za každým rohom',
+  },
+  {
+    id: 'sci-fi',
+    label: 'Sci-fi',
+    prompt: 'Sci-fi: vesmír, budúcnosť, pokročilé technológie, neznáme svety a civilizácie',
+  },
+  {
+    id: 'mystery',
+    label: 'Detektívka / noir',
+    prompt: 'Detektívka a noir: mesto v daždi, záhady, stopy, napätie a neistota',
+  },
+  {
+    id: 'post-apocalypse',
+    label: 'Post-apokalypsa',
+    prompt: 'Post-apokalypsa: opustený svet, prežitie, ruinované mestá, nedostatok zdrojov',
+  },
+  {
+    id: 'horror',
+    label: 'Horor',
+    prompt: 'Horor: temnota, nadprirodzeno, rastúci strach, claustrofobická atmosféra',
+  },
+];
+
+/**
+ * @typedef {'concise' | 'standard' | 'detailed'} TextLength
+ */
+
+export const TEXT_LENGTH = {
+  CONCISE: 'concise',
+  STANDARD: 'standard',
+  DETAILED: 'detailed',
+};
+
+export const TEXT_LENGTH_OPTIONS = [
+  { id: TEXT_LENGTH.CONCISE, label: 'Stručné', hint: 'Krátke odseky, rýchle tempo' },
+  { id: TEXT_LENGTH.STANDARD, label: 'Štandardné', hint: 'Vyvážený popis a tempo' },
+  { id: TEXT_LENGTH.DETAILED, label: 'Rozpísané', hint: 'Bohatý popis, viac atmosféry' },
+];
+
+/**
+ * @typedef {Object} GameSettings
+ * @property {number} stepsPlanned
+ * @property {string} theme
+ * @property {TextLength} textLength
+ */
+
+/**
+ * @param {{ stepsPlanned: number, themeId: string, customTheme: string, textLength: TextLength }} params
+ * @returns {GameSettings}
+ */
+export function buildGameSettings({ stepsPlanned, themeId, customTheme, textLength }) {
+  const theme = themeId === THEME_CUSTOM_ID
+    ? customTheme.trim()
+    : THEME_PRESETS.find((preset) => preset.id === themeId)?.prompt ?? THEME_PRESETS[0].prompt;
+
+  return { stepsPlanned, theme, textLength };
+}

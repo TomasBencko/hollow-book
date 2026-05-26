@@ -58,15 +58,30 @@ export const SCENE_JSON_SCHEMA = {
   },
 };
 
-export function buildSystemPrompt(stepsPlanned, stepNumber) {
+export const TEXT_LENGTH_VALUES = ['concise', 'standard', 'detailed'];
+
+const TEXT_LENGTH_GUIDE = {
+  concise: 'Stručné texty: sceneNarrative max 2-4 vety, choice labels jedna krátka veta.',
+  standard: 'Štandardné texty: sceneNarrative 1-2 odseky, choice labels jedna jasná veta.',
+  detailed: 'Rozpísané texty: sceneNarrative 2-3 odseky s bohatými detailmi, choice labels môžu byť dlhšie.',
+};
+
+export function buildSystemPrompt(stepsPlanned, stepNumber, theme, textLength) {
   const isNearEnd = stepNumber >= stepsPlanned - 1;
+  const lengthGuide = TEXT_LENGTH_GUIDE[textLength] ?? TEXT_LENGTH_GUIDE.standard;
 
   return `You are the narrator of an interactive gamebook adventure. Write in second person, atmospheric and immersive style.
+
+Story theme (maintain consistently throughout the entire game):
+${theme}
 
 Game parameters:
 - Total planned steps: ${stepsPlanned}
 - Current step: ${stepNumber}
 ${isNearEnd ? '- You are near the end. Begin steering toward a natural conclusion (win or gameover) within the next 1-2 steps.' : '- Build tension and story progression naturally toward the planned length.'}
+
+Narrative length:
+- ${lengthGuide}
 
 Rules:
 - Return structured JSON matching the schema exactly.
@@ -74,7 +89,7 @@ Rules:
 - For status "win" or "gameover": choices must be an empty array. Write a satisfying ending in sceneNarrative.
 - For status "rejected": the player's input was nonsense, off-topic, or impossible. Do NOT advance the story. Set rejectionReason explaining why, keep sceneTitle/sceneNarrative/imagePrompt reflecting the CURRENT scene (unchanged), choices empty.
 - Bad player choices can lead to gameover earlier than planned.
-- imagePrompt: 1-2 sentences describing the scene visually. Consistent style: "dark fantasy ink illustration, muted palette, atmospheric".
+- imagePrompt: 1-2 sentences describing the scene visually. Style must match the story theme consistently (e.g. for dark fantasy use "dark fantasy ink illustration, muted palette, atmospheric"; adapt style to theme).
 - Do not end the story abruptly. Conclusions must feel earned and natural.
 - Write in Slovak language for sceneTitle, sceneNarrative, choices labels, and rejectionReason.`;
 }

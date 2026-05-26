@@ -8,12 +8,12 @@ import { SCREENS } from './modules/game/game.types.js';
 
 export default function App() {
   const [screen, setScreen] = useState(SCREENS.MENU);
-  const [stepsPlanned, setStepsPlanned] = useState(10);
+  const [gameSettings, setGameSettings] = useState(null);
   const [endingScene, setEndingScene] = useState(null);
   const [gameKey, setGameKey] = useState(0);
 
-  const handleStart = useCallback((steps) => {
-    setStepsPlanned(steps);
+  const handleStart = useCallback((settings) => {
+    setGameSettings(settings);
     setEndingScene(null);
     setGameKey((key) => key + 1);
     setScreen(SCREENS.GAME);
@@ -33,10 +33,10 @@ export default function App() {
     <div className="app">
       {screen === SCREENS.MENU && <Menu onStart={handleStart} />}
 
-      {screen === SCREENS.GAME && (
+      {screen === SCREENS.GAME && gameSettings && (
         <Game
           key={gameKey}
-          stepsPlanned={stepsPlanned}
+          gameSettings={gameSettings}
           onEnd={handleEnd}
         />
       )}

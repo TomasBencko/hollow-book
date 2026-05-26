@@ -5,6 +5,7 @@ import {
   parseBody,
   SCENE_JSON_SCHEMA,
   STORY_MODEL,
+  TEXT_LENGTH_VALUES,
 } from './_openai-client.js';
 
 export async function handler(event) {
@@ -18,17 +19,25 @@ export async function handler(event) {
     return jsonResponse(400, { error: 'Invalid JSON body' });
   }
 
-  const { action, stepsPlanned, history = [], payload } = body;
+  const { action, stepsPlanned, theme, textLength, history = [], payload } = body;
 
   if (!action || !stepsPlanned || typeof stepsPlanned !== 'number') {
     return jsonResponse(400, { error: 'Missing action or stepsPlanned' });
+  }
+
+  if (!theme || typeof theme !== 'string') {
+    return jsonResponse(400, { error: 'Missing theme' });
+  }
+
+  if (!textLength || !TEXT_LENGTH_VALUES.includes(textLength)) {
+    return jsonResponse(400, { error: 'Missing or invalid textLength' });
   }
 
   const stepNumber = action === 'start' ? 1 : (history.filter((entry) => entry.role === 'assistant').length + 1);
 
   try {
     const openai = getOpenAIClient();
-    const messages = buildMessages(action, stepsPlanned, stepNumber, history, payload);
+    const messages = buildMessages(action, stepsPlanned, stepNumber, theme, textLength, history, payload);
     const completion = await openai.chat.completions.create({
       model: STORY_MODEL,
       messages,
@@ -52,11 +61,11 @@ export async function handler(event) {
   }
 }
 
-function buildMessages(action, stepsPlanned, stepNumber, history, payload) {
+function buildMessages(action, stepsPlanned, stepNumber, theme, textLength, history, payload) {
   const messages = [
     {
       role: 'system',
-      content: buildSystemPrompt(stepsPlanned, stepNumber),
+      content: buildSystemPrompt(stepsPlanned, stepNumber, theme, textLength),
     },
   ];
 
@@ -67,7 +76,7 @@ function buildMessages(action, stepsPlanned, stepNumber, history, payload) {
   if (action === 'start') {
     messages.push({
       role: 'user',
-      content: 'Začni novú hru. Vytvor úvodnú scénu s 2-3 možnosťami ako pokračovať.',
+      content: `Začni novú hru v téme: ${theme}. Vytvor úvodnú scénu s 2-3 možnosťami ako pokračovať.`,
     });
   } else if (action === 'choice') {
     messages.push({

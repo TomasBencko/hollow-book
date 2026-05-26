@@ -124,6 +124,54 @@ body {
   border-color: #5c6bc0;
 }
 
+.form-input--spaced {
+  margin-top: 0.75rem;
+}
+
+.form-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #3a3a48;
+  border-radius: 8px;
+  background: #2a2a34;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.form-radio-option:has(input:checked) {
+  border-color: #5c6bc0;
+  background: #2e2e3a;
+}
+
+.form-radio-option input {
+  margin-top: 0.2rem;
+  accent-color: #5c6bc0;
+}
+
+.form-radio-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.form-radio-label {
+  font-weight: 500;
+  color: #e8e6e3;
+}
+
+.form-radio-hint {
+  font-size: 0.875rem;
+  color: #888;
+}
+
 .scene-image {
   width: 100%;
   aspect-ratio: 16 / 10;
