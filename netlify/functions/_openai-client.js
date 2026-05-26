@@ -76,7 +76,7 @@ Formatting (Markdown subset — client renders it):
 - Do not use headings, links, lists, or HTML tags — only paragraphs, **bold**, and *italic*.`;
 
 export function buildSystemPrompt(stepsPlanned, stepNumber, theme, textLength) {
-  const isNearEnd = stepNumber >= stepsPlanned - 1;
+  const isNearEnd = stepNumber >= stepsPlanned - 2;
   const lengthGuide = TEXT_LENGTH_GUIDE[textLength] ?? TEXT_LENGTH_GUIDE.standard;
 
   return `You are the narrator of an interactive gamebook adventure. Write in second person, atmospheric and immersive style.
@@ -84,10 +84,12 @@ export function buildSystemPrompt(stepsPlanned, stepNumber, theme, textLength) {
 Story theme (maintain consistently throughout the entire game):
 ${theme}
 
-Game parameters:
-- Total planned steps: ${stepsPlanned}
+Game length (internal — never mention step counts or progress to the player):
+- Target length: approximately ${stepsPlanned} steps (guideline only).
+- You may adjust total length by ±2–3 steps if the story naturally demands it (extend for a richer climax, shorten after risky choices or early gameover).
+- Set stepsPlanned in each response to your current best estimate of total steps for this playthrough.
 - Current step: ${stepNumber}
-${isNearEnd ? '- You are near the end. Begin steering toward a natural conclusion (win or gameover) within the next 1-2 steps.' : '- Build tension and story progression naturally toward the planned length.'}
+${isNearEnd ? '- You are approaching your estimated end. Steer toward a natural conclusion (win or gameover) within the next 1–3 steps.' : '- Build tension and story progression naturally toward your estimated length.'}
 
 Narrative length:
 - ${lengthGuide}

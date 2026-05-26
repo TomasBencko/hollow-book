@@ -52,8 +52,13 @@ export default function Game({ gameSettings, initialState, onEnd }) {
     dispatch({ type: GAME_STATE_ACTIONS.SET_LOADING, payload: true });
     dispatch({ type: GAME_STATE_ACTIONS.SET_REJECTION, payload: null });
 
+    const activeSettings = {
+      ...gameSettings,
+      stepsPlanned: state.currentScene.stepsPlanned ?? gameSettings.stepsPlanned,
+    };
+
     try {
-      const { scene, imageUrl } = await submitChoice(state.history, gameSettings, payload);
+      const { scene, imageUrl } = await submitChoice(state.history, activeSettings, payload);
 
       if (scene.status === 'rejected') {
         setPendingSelection(null);
@@ -88,18 +93,11 @@ export default function Game({ gameSettings, initialState, onEnd }) {
   }, [handleChoice]);
 
   const scene = state.currentScene;
-  const progressPct = (scene.stepNumber / scene.stepsPlanned) * 100;
 
   return (
     <div className="screen screen--game">
       <header className="game-header">
         <span className="game-brand">Hollow Book</span>
-        <div className="game-progress">
-          <div className="game-progress-track">
-            <div className="game-progress-fill" style={{ width: `${progressPct}%` }} />
-          </div>
-          <span className="game-progress-label">{scene.stepNumber} / {scene.stepsPlanned}</span>
-        </div>
       </header>
 
       <div className="game-layout">

@@ -49,7 +49,26 @@ export const SCREENS = {
   GAMEOVER: 'gameover',
 };
 
-export const STEP_OPTIONS = [5, 10, 15];
+/** @typedef {'fast' | 'medium' | 'long'} GameLength */
+
+export const GAME_LENGTH = {
+  FAST: 'fast',
+  MEDIUM: 'medium',
+  LONG: 'long',
+};
+
+export const GAME_LENGTH_OPTIONS = [
+  { id: GAME_LENGTH.FAST, label: 'Rýchla hra', hint: 'Krátke dobrodružstvo' },
+  { id: GAME_LENGTH.MEDIUM, label: 'Stredná hra', hint: 'Vyvážené tempo' },
+  { id: GAME_LENGTH.LONG, label: 'Dlhá hra', hint: 'Rozsiahlejší príbeh' },
+];
+
+/** Orientačný počet krokov pre LLM — nie je zobrazený hráčovi. */
+export const GAME_LENGTH_STEPS = {
+  fast: 5,
+  medium: 10,
+  long: 20,
+};
 
 export const THEME_CUSTOM_ID = 'custom';
 
@@ -99,19 +118,19 @@ export const TEXT_LENGTH_OPTIONS = [
 
 /**
  * @typedef {Object} GameSettings
- * @property {number} stepsPlanned
+ * @property {number} stepsPlanned - orientačný počet krokov pre LLM (5 / 10 / 20)
  * @property {string} theme
  * @property {TextLength} textLength
  */
 
 /**
- * @param {{ stepsPlanned: number, themeId: string, customTheme: string, textLength: TextLength }} params
+ * @param {{ gameLength: GameLength, themeId: string, customTheme: string, textLength: TextLength }} params
  * @returns {GameSettings}
  */
-export function buildGameSettings({ stepsPlanned, themeId, customTheme, textLength }) {
+export function buildGameSettings({ gameLength, themeId, customTheme, textLength }) {
   const theme = themeId === THEME_CUSTOM_ID
     ? customTheme.trim()
     : THEME_PRESETS.find((preset) => preset.id === themeId)?.prompt ?? THEME_PRESETS[0].prompt;
 
-  return { stepsPlanned, theme, textLength };
+  return { stepsPlanned: GAME_LENGTH_STEPS[gameLength], theme, textLength };
 }

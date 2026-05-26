@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 import {
   buildGameSettings,
-  STEP_OPTIONS,
+  GAME_LENGTH,
+  GAME_LENGTH_OPTIONS,
   TEXT_LENGTH,
   TEXT_LENGTH_OPTIONS,
   THEME_CUSTOM_ID,
@@ -18,7 +19,7 @@ const THEME_ICONS = {
 };
 
 export default function Menu({ onStart }) {
-  const [stepsPlanned, setStepsPlanned] = useState(10);
+  const [gameLength, setGameLength] = useState(GAME_LENGTH.MEDIUM);
   const [themeId, setThemeId] = useState(THEME_PRESETS[0].id);
   const [customTheme, setCustomTheme] = useState('');
   const [textLength, setTextLength] = useState(TEXT_LENGTH.STANDARD);
@@ -28,7 +29,7 @@ export default function Menu({ onStart }) {
 
   const handleStart = () => {
     if (!canStart) return;
-    onStart(buildGameSettings({ stepsPlanned, themeId, customTheme, textLength }));
+    onStart(buildGameSettings({ gameLength, themeId, customTheme, textLength }));
   };
 
   return (
@@ -97,25 +98,19 @@ export default function Menu({ onStart }) {
 
       <div className="menu-section">
         <p className="menu-section-label">Dĺžka hry</p>
-        <div className="slider-wrapper">
-          <div className="slider-header">
-            <span style={{ fontSize: '1rem', color: 'var(--text-dim)' }}>Počet krokov</span>
-            <span className="slider-value">{stepsPlanned} krokov</span>
-          </div>
-          <input
-            type="range"
-            min={STEP_OPTIONS[0]}
-            max={STEP_OPTIONS[STEP_OPTIONS.length - 1]}
-            step={STEP_OPTIONS[1] - STEP_OPTIONS[0]}
-            value={stepsPlanned}
-            onChange={(event) => setStepsPlanned(Number(event.target.value))}
-            aria-label="Počet krokov hry"
-          />
-          <div className="slider-ticks">
-            {STEP_OPTIONS.map((steps) => (
-              <span key={steps} className="slider-tick">{steps}</span>
-            ))}
-          </div>
+        <div className="segment-group" role="group" aria-label="Dĺžka hry">
+          {GAME_LENGTH_OPTIONS.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className={`segment-btn${gameLength === option.id ? ' segment-btn--active' : ''}`}
+              onClick={() => setGameLength(option.id)}
+              aria-pressed={gameLength === option.id}
+            >
+              {option.label}
+              <span className="segment-btn-hint">{option.hint}</span>
+            </button>
+          ))}
         </div>
       </div>
 
