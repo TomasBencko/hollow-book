@@ -294,6 +294,26 @@ body {
   cursor: not-allowed;
 }
 
+.btn-choice:disabled.btn-choice--selected {
+  opacity: 1;
+  cursor: wait;
+}
+
+.btn-choice--selected {
+  border-color: var(--gold-dim);
+  background: var(--bg-hover);
+  box-shadow: 0 0 0 1px var(--gold-glow), inset 0 0 24px rgba(201, 168, 76, 0.06);
+}
+
+.btn-choice--selected::before {
+  transform: scaleY(1);
+}
+
+.btn-choice--selected .btn-choice-letter {
+  background: var(--gold-dim);
+  color: var(--gold-bright);
+}
+
 .btn-choice-letter {
   display: flex;
   align-items: center;
@@ -843,14 +863,111 @@ input[type='range']::-moz-range-thumb {
   color: var(--text-muted);
 }
 
+.loading-indicator--chapter {
+  padding: 1.25rem 0 0.5rem;
+}
+
+.loading-text--chapter {
+  animation: loadingTextFade 0.45s ease-out both;
+}
+
+.codex-spinner {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.codex-spinner-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid transparent;
+}
+
+.codex-spinner-ring--outer {
+  border-top-color: var(--gold);
+  border-right-color: rgba(201, 168, 76, 0.25);
+  animation: codexSpin 2.4s linear infinite;
+}
+
+.codex-spinner-ring--inner {
+  inset: 8px;
+  border-bottom-color: var(--gold-dim);
+  border-left-color: rgba(201, 168, 76, 0.15);
+  animation: codexSpin 1.6s linear infinite reverse;
+}
+
+.codex-spinner-core {
+  font-size: 0.85rem;
+  color: var(--gold-bright);
+  animation: codexCorePulse 2s ease-in-out infinite;
+}
+
+@keyframes codexSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes codexCorePulse {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes loadingTextFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ============================================================
    SCENE INPUT
    ============================================================ */
+
+.scene-actions {
+  margin-top: 0.5rem;
+}
+
+.scene-pending {
+  margin-top: 0.5rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border-faint);
+  animation: scenePendingEnter 0.35s ease-out both;
+}
+
+@keyframes scenePendingEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 
 .scene-input-row {
   display: flex;
   gap: 0.625rem;
   margin-top: 0.75rem;
+  transition: opacity 0.2s;
+}
+
+.scene-input-row--pending .form-input {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 1px var(--gold-glow);
 }
 
 .scene-input-row .form-input {

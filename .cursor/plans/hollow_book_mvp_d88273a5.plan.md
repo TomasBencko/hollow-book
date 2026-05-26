@@ -130,7 +130,7 @@ sequenceDiagram
 
 - **`menu.jsx`** — názov hry, výber témy ako klikateľné karty (5 predvolieb + vlastná téma), dĺžka textov ako segment/pill toggle, dĺžka hry ako range slider (5 / 10 / 15 krokov), "Otvoriť príbeh" → `app.jsx` spustí `startGame` z click handlera (nie `useEffect` — vyhne sa dvojitému volaniu v React Strict Mode).
 - **`app.jsx`** — pri štarte volá `startGame`, zobrazí loading, potom mountne `Game` s `initialState` alebo rovno ending screen.
-- **`game.jsx`** — riadi `useReducer` stav od `initialState`; na desktope (≥900px) **split layout**: sticky obrázok vľavo, scrollovateľný obsah vpravo s progress barom v hlavičke. Na mobile stĺpcový layout. Po každej akcii: čaká na story aj image; UI ukazuje animovaný skeleton pre obrázok kým sa nahráva.
+- **`game.jsx`** — riadi `useReducer` stav od `initialState`; na desktope (≥900px) **split layout**: sticky obrázok vľavo, scrollovateľný obsah vpravo s progress barom v hlavičke. Na mobile stĺpcový layout. Po každej akcii: čaká na story aj image; UI ukazuje animovaný skeleton pre obrázok kým sa nahráva. Počas čakania na AI zostávajú voľby a input viditeľné (disabled), vybraná možnosť zvýraznená, vlastný text sa nemaže až do prepnutia scény; pod akciami codex loading animácia s rotujúcimi textami.
 - **`win-screen.jsx` / `game-over-screen.jsx`** — ilustrácia z `imagePrompt` poslednej scény (`SceneImage`), záverečný text + "Play again" → reset do menu.
 
 ## Netlify Functions — kľúčové body
@@ -163,7 +163,7 @@ sequenceDiagram
 - **Fonty:** `Cinzel` (display/nadpisy, Google Fonts), `Crimson Pro` (narativný text, Google Fonts).
 - **Farby:** `--bg: #09080e`, `--gold: #c9a84c`, `--text: #ece4d6` — definované ako CSS custom properties.
 - **Desktop layout hry:** flex row split — sticky obrázok 46% vľavo, scrollovateľný obsah vpravo; breakpoint 900px.
-- **Animácie:** fade-in scény, staggered vstup volieb (75ms delay per item), pulse loading dots, hover efekty na choices (gold left border).
+- **Animácie:** fade-in scény, staggered vstup volieb (75ms delay per item), pulse loading dots, codex spinner pri čakaní na kapitolu (rotujúce prstence + striedajúce sa texty), hover efekty na choices (gold left border), zvýraznenie vybranej voľby počas loading stavu.
 - **Menu:** theme karty v mriežke, segment-pill pre dĺžku textov, range slider pre počet krokov.
 - **Endings:** obrázok s gradient fade do obsahu, badge (Víťazstvo / Koniec hry).
 

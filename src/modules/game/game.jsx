@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 
 import FormattedText from '../../shared/formatted-text.jsx';
 
@@ -17,6 +17,20 @@ export default function Game({ gameSettings, initialState, onEnd }) {
     imageUrl: initialState.imageUrl,
     history: initialState.history,
   });
+  const [customInputValue, setCustomInputValue] = useState('');
+  const [pendingSelection, setPendingSelection] = useState(null);
+  const lastStepRef = useRef(initialState.scene.stepNumber);
+  const submittingRef = useRef(false);
+  const isInteractionLocked = state.isLoading || pendingSelection !== null;
+
+  useEffect(() => {
+    const stepNumber = state.currentScene?.stepNumber;
+    if (stepNumber == null || stepNumber === lastStepRef.current) return;
+
+    lastStepRef.current = stepNumber;
+    setCustomInputValue('');
+    setPendingSelection(null);
+  }, [state.currentScene?.stepNumber]);
 
   const handleSceneResult = useCallback((scene, imageUrl, history, rejection = null) => {
     dispatch({
@@ -30,9 +44,11 @@ export default function Game({ gameSettings, initialState, onEnd }) {
     }
   }, [onEnd]);
 
-  const handleChoice = useCallback(async (payload) => {
-    if (state.isLoading || !state.currentScene) return;
+  const handleChoice = useCallback(async (payload, source = 'choice') => {
+    if (submittingRef.current || !state.currentScene) return;
 
+    submittingRef.current = true;
+    setPendingSelection({ type: source, value: payload });
     dispatch({ type: GAME_STATE_ACTIONS.SET_LOADING, payload: true });
     dispatch({ type: GAME_STATE_ACTIONS.SET_REJECTION, payload: null });
 
@@ -40,6 +56,7 @@ export default function Game({ gameSettings, initialState, onEnd }) {
       const { scene, imageUrl } = await submitChoice(state.history, gameSettings, payload);
 
       if (scene.status === 'rejected') {
+        setPendingSelection(null);
         dispatch({
           type: GAME_STATE_ACTIONS.SET_SCENE,
           payload: {
@@ -55,9 +72,20 @@ export default function Game({ gameSettings, initialState, onEnd }) {
       const history = appendToHistory(state.history, payload, scene);
       handleSceneResult(scene, imageUrl, history);
     } catch (error) {
+      setPendingSelection(null);
       dispatch({ type: GAME_STATE_ACTIONS.SET_ERROR, payload: error.message });
+    } finally {
+      submittingRef.current = false;
     }
-  }, [state.isLoading, state.currentScene, state.history, state.imageUrl, gameSettings, handleSceneResult]);
+  }, [state.currentScene, state.history, state.imageUrl, gameSettings, handleSceneResult]);
+
+  const handlePresetChoice = useCallback((label) => {
+    handleChoice(label, 'choice');
+  }, [handleChoice]);
+
+  const handleCustomChoice = useCallback((text) => {
+    handleChoice(text, 'custom');
+  }, [handleChoice]);
 
   const scene = state.currentScene;
   const progressPct = (scene.stepNumber / scene.stepsPlanned) * 100;
@@ -95,18 +123,26 @@ export default function Game({ gameSettings, initialState, onEnd }) {
             </div>
           )}
 
-          {state.isLoading ? (
-            <LoadingIndicator message="Píše sa ďalšia kapitola..." />
-          ) : (
-            <>
-              <SceneChoices
-                choices={scene.choices}
-                onChoice={handleChoice}
-                disabled={state.isLoading}
-              />
-              <SceneInput onSubmit={handleChoice} disabled={state.isLoading} />
-            </>
-          )}
+          <div className="scene-actions">
+            <SceneChoices
+              choices={scene.choices}
+              onChoice={handlePresetChoice}
+              disabled={isInteractionLocked}
+              selectedLabel={pendingSelection?.type === 'choice' ? pendingSelection.value : null}
+            />
+            <SceneInput
+              value={customInputValue}
+              onChange={setCustomInputValue}
+              onSubmit={handleCustomChoice}
+              disabled={isInteractionLocked}
+              isPending={pendingSelection?.type === 'custom'}
+            />
+            {isInteractionLocked && (
+              <div className="scene-pending">
+                <LoadingIndicator variant="chapter" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

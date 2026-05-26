@@ -1,25 +1,25 @@
-import { useState } from 'react';
-
-export default function SceneInput({ onSubmit, disabled }) {
-  const [value, setValue] = useState('');
-
+export default function SceneInput({ value, onChange, onSubmit, disabled, isPending }) {
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (disabled) return;
     const trimmed = value.trim();
-    if (!trimmed || disabled) return;
+    if (!trimmed) return;
     onSubmit(trimmed);
-    setValue('');
   };
 
   return (
-    <form className="scene-input-row" onSubmit={handleSubmit}>
+    <form
+      className={`scene-input-row${isPending ? ' scene-input-row--pending' : ''}`}
+      onSubmit={handleSubmit}
+    >
       <input
         type="text"
         className="form-input"
         placeholder="Alebo napíš vlastnú odpoveď..."
         value={value}
-        onChange={(event) => setValue(event.target.value)}
+        onChange={(event) => onChange(event.target.value)}
         disabled={disabled}
+        aria-busy={isPending}
       />
       <button type="submit" className="btn btn-primary" disabled={disabled || !value.trim()}>
         Odoslať
