@@ -128,8 +128,8 @@ sequenceDiagram
 
 ## Komponenty hlavných obrazoviek
 
-- **`menu.jsx`** — názov hry, výber témy (5 predvolieb + vlastná téma), dĺžka textov (stručné / štandardné / rozpísané), dĺžka hry (5 / 10 / 15 krokov), "Start" → `app.jsx` prepne na `game` s `GameSettings`.
-- **`game.jsx`** — riadi `useReducer` stav `{ stepsPlanned, currentScene, history, imageUrl, isLoading, rejection }`; prijíma `gameSettings` (theme, textLength, stepsPlanned). Po každej akcii: paralelne čaká na story aj (po prijatí) image; UI ukazuje skeleton pre obrázok kým sa nahráva.
+- **`menu.jsx`** — názov hry, výber témy ako klikateľné karty (5 predvolieb + vlastná téma), dĺžka textov ako segment/pill toggle, dĺžka hry ako range slider (5 / 10 / 15 krokov), "Otvoriť príbeh" → `app.jsx` prepne na `game` s `GameSettings`.
+- **`game.jsx`** — riadi `useReducer` stav; na desktope (≥900px) **split layout**: sticky obrázok vľavo, scrollovateľný obsah vpravo s progress barom v hlavičke. Na mobile stĺpcový layout. Po každej akcii: paralelne čaká na story aj image; UI ukazuje animovaný skeleton pre obrázok kým sa nahráva.
 - **`win-screen.jsx` / `game-over-screen.jsx`** — ilustrácia z `imagePrompt` poslednej scény (`SceneImage`), záverečný text + "Play again" → reset do menu.
 
 ## Netlify Functions — kľúčové body
@@ -156,9 +156,15 @@ sequenceDiagram
   status = 200
 ```
 
-## Dizajn (zámerne minimal pre MVP)
+## Dizajn
 
-- Jeden `base.css`, system font stack, tmavšie pozadie, vzdušné spacing, max-width container ~720px, jemné prechody. Narratívne texty: odseky, **bold**, *italic* cez `FormattedText`. Vracia sa k tomu neskôr.
+- **Téma:** "Ancient Codex" — tmavé pozadie s fialovým podtónom, zlaté/jantárové akcenty, serif typografia.
+- **Fonty:** `Cinzel` (display/nadpisy, Google Fonts), `Crimson Pro` (narativný text, Google Fonts).
+- **Farby:** `--bg: #09080e`, `--gold: #c9a84c`, `--text: #ece4d6` — definované ako CSS custom properties.
+- **Desktop layout hry:** flex row split — sticky obrázok 46% vľavo, scrollovateľný obsah vpravo; breakpoint 900px.
+- **Animácie:** fade-in scény, staggered vstup volieb (75ms delay per item), pulse loading dots, hover efekty na choices (gold left border).
+- **Menu:** theme karty v mriežke, segment-pill pre dĺžku textov, range slider pre počet krokov.
+- **Endings:** obrázok s gradient fade do obsahu, badge (Víťazstvo / Koniec hry).
 
 ## Mimo rozsahu MVP
 

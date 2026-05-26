@@ -9,6 +9,14 @@ import {
   THEME_PRESETS,
 } from '../game/game.types.js';
 
+const THEME_ICONS = {
+  'dark-fantasy': '⚔️',
+  'sci-fi': '🚀',
+  'mystery': '🕵️',
+  'post-apocalypse': '☢️',
+  'horror': '👁️',
+};
+
 export default function Menu({ onStart }) {
   const [stepsPlanned, setStepsPlanned] = useState(10);
   const [themeId, setThemeId] = useState(THEME_PRESETS[0].id);
@@ -20,34 +28,42 @@ export default function Menu({ onStart }) {
 
   const handleStart = () => {
     if (!canStart) return;
-
     onStart(buildGameSettings({ stepsPlanned, themeId, customTheme, textLength }));
   };
 
   return (
     <div className="screen">
-      <h1 className="screen-title">Hollow Book</h1>
-      <p className="screen-subtitle">
-        Interaktívna <strong>gamebook</strong> hra. Každá voľba mení <em>príbeh</em> — a ilustráciu.
-      </p>
+      <div className="menu-hero">
+        <span className="menu-ornament">— The —</span>
+        <h1 className="screen-title">Hollow Book</h1>
+        <p className="screen-subtitle">
+          Interaktívna <strong>gamebook</strong> hra. Každá voľba mení <em>príbeh</em> — a ilustráciu.
+        </p>
+      </div>
 
-      <div className="form-group">
-        <label className="form-label" htmlFor="theme-select">
-          Téma príbehu
-        </label>
-        <select
-          id="theme-select"
-          className="form-select"
-          value={themeId}
-          onChange={(event) => setThemeId(event.target.value)}
-        >
+      <div className="menu-section">
+        <p className="menu-section-label">Téma príbehu</p>
+        <div className="theme-grid">
           {THEME_PRESETS.map((preset) => (
-            <option key={preset.id} value={preset.id}>
-              {preset.label}
-            </option>
+            <button
+              key={preset.id}
+              type="button"
+              className={`theme-card${themeId === preset.id ? ' theme-card--active' : ''}`}
+              onClick={() => setThemeId(preset.id)}
+            >
+              <span className="theme-card-icon">{THEME_ICONS[preset.id]}</span>
+              <span className="theme-card-label">{preset.label}</span>
+            </button>
           ))}
-          <option value={THEME_CUSTOM_ID}>Vlastná téma</option>
-        </select>
+          <button
+            type="button"
+            className={`theme-card${themeId === THEME_CUSTOM_ID ? ' theme-card--active' : ''}`}
+            onClick={() => setThemeId(THEME_CUSTOM_ID)}
+          >
+            <span className="theme-card-icon">✍️</span>
+            <span className="theme-card-label">Vlastná téma</span>
+          </button>
+        </div>
         {isCustomTheme && (
           <input
             type="text"
@@ -61,53 +77,58 @@ export default function Menu({ onStart }) {
         )}
       </div>
 
-      <div className="form-group">
-        <span className="form-label">Dĺžka textov</span>
-        <div className="form-radio-group" role="radiogroup" aria-label="Dĺžka textov">
+      <div className="menu-section">
+        <p className="menu-section-label">Dĺžka textov</p>
+        <div className="segment-group" role="group" aria-label="Dĺžka textov">
           {TEXT_LENGTH_OPTIONS.map((option) => (
-            <label key={option.id} className="form-radio-option">
-              <input
-                type="radio"
-                name="text-length"
-                value={option.id}
-                checked={textLength === option.id}
-                onChange={() => setTextLength(option.id)}
-              />
-              <span className="form-radio-content">
-                <span className="form-radio-label">{option.label}</span>
-                <span className="form-radio-hint">{option.hint}</span>
-              </span>
-            </label>
+            <button
+              key={option.id}
+              type="button"
+              className={`segment-btn${textLength === option.id ? ' segment-btn--active' : ''}`}
+              onClick={() => setTextLength(option.id)}
+              aria-pressed={textLength === option.id}
+            >
+              {option.label}
+              <span className="segment-btn-hint">{option.hint}</span>
+            </button>
           ))}
         </div>
       </div>
 
-      <div className="form-group">
-        <label className="form-label" htmlFor="steps-select">
-          Dĺžka hry (počet krokov)
-        </label>
-        <select
-          id="steps-select"
-          className="form-select"
-          value={stepsPlanned}
-          onChange={(event) => setStepsPlanned(Number(event.target.value))}
-        >
-          {STEP_OPTIONS.map((steps) => (
-            <option key={steps} value={steps}>
-              {steps} krokov
-            </option>
-          ))}
-        </select>
+      <div className="menu-section">
+        <p className="menu-section-label">Dĺžka hry</p>
+        <div className="slider-wrapper">
+          <div className="slider-header">
+            <span style={{ fontSize: '1rem', color: 'var(--text-dim)' }}>Počet krokov</span>
+            <span className="slider-value">{stepsPlanned} krokov</span>
+          </div>
+          <input
+            type="range"
+            min={STEP_OPTIONS[0]}
+            max={STEP_OPTIONS[STEP_OPTIONS.length - 1]}
+            step={STEP_OPTIONS[1] - STEP_OPTIONS[0]}
+            value={stepsPlanned}
+            onChange={(event) => setStepsPlanned(Number(event.target.value))}
+            aria-label="Počet krokov hry"
+          />
+          <div className="slider-ticks">
+            {STEP_OPTIONS.map((steps) => (
+              <span key={steps} className="slider-tick">{steps}</span>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <button
-        type="button"
-        className="btn btn-primary"
-        onClick={handleStart}
-        disabled={!canStart}
-      >
-        Začať hru
-      </button>
+      <div className="menu-cta">
+        <button
+          type="button"
+          className="btn btn-primary btn-start"
+          onClick={handleStart}
+          disabled={!canStart}
+        >
+          Otvoriť príbeh
+        </button>
+      </div>
     </div>
   );
 }
