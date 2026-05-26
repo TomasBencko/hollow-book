@@ -128,8 +128,9 @@ sequenceDiagram
 
 ## Komponenty hlavných obrazoviek
 
-- **`menu.jsx`** — názov hry, výber témy ako klikateľné karty (5 predvolieb + vlastná téma), dĺžka textov ako segment/pill toggle, dĺžka hry ako range slider (5 / 10 / 15 krokov), "Otvoriť príbeh" → `app.jsx` prepne na `game` s `GameSettings`.
-- **`game.jsx`** — riadi `useReducer` stav; na desktope (≥900px) **split layout**: sticky obrázok vľavo, scrollovateľný obsah vpravo s progress barom v hlavičke. Na mobile stĺpcový layout. Po každej akcii: paralelne čaká na story aj image; UI ukazuje animovaný skeleton pre obrázok kým sa nahráva.
+- **`menu.jsx`** — názov hry, výber témy ako klikateľné karty (5 predvolieb + vlastná téma), dĺžka textov ako segment/pill toggle, dĺžka hry ako range slider (5 / 10 / 15 krokov), "Otvoriť príbeh" → `app.jsx` spustí `startGame` z click handlera (nie `useEffect` — vyhne sa dvojitému volaniu v React Strict Mode).
+- **`app.jsx`** — pri štarte volá `startGame`, zobrazí loading, potom mountne `Game` s `initialState` alebo rovno ending screen.
+- **`game.jsx`** — riadi `useReducer` stav od `initialState`; na desktope (≥900px) **split layout**: sticky obrázok vľavo, scrollovateľný obsah vpravo s progress barom v hlavičke. Na mobile stĺpcový layout. Po každej akcii: čaká na story aj image; UI ukazuje animovaný skeleton pre obrázok kým sa nahráva.
 - **`win-screen.jsx` / `game-over-screen.jsx`** — ilustrácia z `imagePrompt` poslednej scény (`SceneImage`), záverečný text + "Play again" → reset do menu.
 
 ## Netlify Functions — kľúčové body

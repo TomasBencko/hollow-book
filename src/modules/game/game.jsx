@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useReducer } from 'react';
 
 import FormattedText from '../../shared/formatted-text.jsx';
 
@@ -6,14 +6,16 @@ import LoadingIndicator from './components/loading-indicator.jsx';
 import SceneChoices from './components/scene-choices.jsx';
 import SceneImage from './components/scene-image.jsx';
 import SceneInput from './components/scene-input.jsx';
-import { appendToHistory, startGame, submitChoice } from './game.service.js';
+import { appendToHistory, submitChoice } from './game.service.js';
 import { GAME_STATE_ACTIONS, gameReducer, getScreenFromScene, initialGameState } from './game.state.js';
 
-export default function Game({ gameSettings, onEnd, onError }) {
+export default function Game({ gameSettings, initialState, onEnd }) {
   const [state, dispatch] = useReducer(gameReducer, {
     ...initialGameState,
     stepsPlanned: gameSettings.stepsPlanned,
-    isLoading: true,
+    currentScene: initialState.scene,
+    imageUrl: initialState.imageUrl,
+    history: initialState.history,
   });
 
   const handleSceneResult = useCallback((scene, imageUrl, history, rejection = null) => {
@@ -57,43 +59,7 @@ export default function Game({ gameSettings, onEnd, onError }) {
     }
   }, [state.isLoading, state.currentScene, state.history, state.imageUrl, gameSettings, handleSceneResult]);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      dispatch({ type: GAME_STATE_ACTIONS.SET_LOADING, payload: true });
-
-      try {
-        const { scene, imageUrl } = await startGame(gameSettings);
-        if (cancelled) return;
-
-        const history = appendToHistory([], 'Začni novú hru.', scene);
-        handleSceneResult(scene, imageUrl, history);
-      } catch (error) {
-        if (cancelled) return;
-        dispatch({ type: GAME_STATE_ACTIONS.SET_ERROR, payload: error.message });
-        onError?.(error.message);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [gameSettings, handleSceneResult, onError]);
-
   const scene = state.currentScene;
-
-  if (!scene) {
-    return (
-      <div className="screen screen--game">
-        <div className="game-loading-screen">
-          {state.error && <div className="error-banner">{state.error}</div>}
-          <LoadingIndicator message="Otváram príbeh..." />
-        </div>
-      </div>
-    );
-  }
-
   const progressPct = (scene.stepNumber / scene.stepsPlanned) * 100;
 
   return (
