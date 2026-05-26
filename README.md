@@ -1,0 +1,33 @@
+# Hollow Book
+
+Interaktívna gamebook hra s AI-generovaným príbehom a ilustráciami.
+
+## Stack
+
+- React + Vite (JS)
+- Netlify Functions + OpenAI SDK
+- Modely: `gpt-4o-mini` (príbeh), `gpt-image-1` (ilustrácie, low quality)
+
+## Lokálny vývoj
+
+```bash
+npm install
+cp .env.example .env   # dopln OPENAI_API_KEY
+npm run dev            # frontend na :5173
+npm run dev:full       # frontend + functions (odporúčané)
+```
+
+Bez `netlify dev` frontend beží, ale API volania zlyhajú — functions vyžadujú Netlify runtime.
+
+## Deploy
+
+1. Push na GitHub, pripoj repo v Netlify
+2. Nastav env `OPENAI_API_KEY` v Netlify dashboard
+3. Build: `npm run build`, publish: `dist`
+
+## API
+
+- `POST /api/story` — generovanie scény (structured JSON)
+- `POST /api/image` — generovanie ilustrácie (base64 PNG)
+
+Kľúč OpenAI je len server-side v Netlify Functions.
