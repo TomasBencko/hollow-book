@@ -27,17 +27,17 @@ export default function Game({ gameSettings, initialState, onEnd }) {
     const scene = state.currentScene;
     if (!scene?.imagePrompt) return undefined;
 
-    const controller = new AbortController();
+    let active = true;
     dispatch({ type: GAME_STATE_ACTIONS.SET_IMAGE_LOADING, payload: true });
 
-    loadSceneImage(scene, { signal: controller.signal }).then((imageUrl) => {
-      if (!controller.signal.aborted) {
+    loadSceneImage(scene).then((imageUrl) => {
+      if (active) {
         dispatch({ type: GAME_STATE_ACTIONS.SET_IMAGE, payload: { imageUrl } });
       }
     });
 
     return () => {
-      controller.abort();
+      active = false;
     };
   }, [state.currentScene?.stepNumber, state.currentScene?.imagePrompt]);
 

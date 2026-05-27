@@ -15,14 +15,13 @@ const inFlightImageRequests = new Map();
  * Deduplicates concurrent image requests for the same prompt (protects against
  * React StrictMode double-invoke and any accidental parallel callers).
  * @param {string} prompt
- * @param {{ signal?: AbortSignal }} [options]
  * @returns {Promise<{ dataUrl: string }>}
  */
-export async function fetchImage(prompt, { signal } = {}) {
+export async function fetchImage(prompt) {
   const existing = inFlightImageRequests.get(prompt);
   if (existing) return existing;
 
-  const request = apiPost('image', { prompt }, { signal })
+  const request = apiPost('image', { prompt })
     .finally(() => { inFlightImageRequests.delete(prompt); });
 
   inFlightImageRequests.set(prompt, request);
@@ -60,14 +59,13 @@ export async function submitChoice(history, gameSettings, payload) {
  * @param {import('./game.types.js').Scene} scene
  * @returns {Promise<string|null>}
  */
-export async function loadSceneImage(scene, { signal } = {}) {
+export async function loadSceneImage(scene) {
   if (!scene.imagePrompt) return null;
 
   try {
-    const { dataUrl } = await fetchImage(scene.imagePrompt, { signal });
+    const { dataUrl } = await fetchImage(scene.imagePrompt);
     return dataUrl;
   } catch (error) {
-    if (error.name === 'AbortError') return null;
     console.error('Failed to load scene image:', error);
     return null;
   }

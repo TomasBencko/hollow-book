@@ -5,7 +5,7 @@ Interaktívna gamebook hra: LLM generuje scény a voľby, samostatný endpoint g
 ## Architektúra
 
 ```
-React (Vite)  →  POST /api/story   →  Netlify Function  →  gpt-4o-mini (JSON schema)
+React (Vite)  →  POST /api/story   →  Netlify Function  →  gpt-5.4-nano (JSON schema)
               →  POST /api/image   →  Netlify Function  →  gpt-image-1 (low)
 ```
 

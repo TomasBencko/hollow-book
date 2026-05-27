@@ -6,7 +6,7 @@ AI gamebook (React + Netlify Functions + OpenAI). Detailný tok a schémy: [docs
 
 - **Frontend:** Vite, React 19, čistý JS + JSDoc (`game.types.js`)
 - **Backend:** Netlify Functions (`story.js`, `image.js`), shared `_openai-client.js` (prefix `_` = nie je endpoint)
-- **Modely:** `gpt-4o-mini` (structured JSON), `gpt-image-1` quality `low`
+- **Modely:** `gpt-5.4-nano` (structured JSON), `gpt-image-1` quality `low`
 - **API z klienta:** `fetch` na `/api/*` cez `src/shared/api-client.js`
 
 ## Konvencie (stručne)

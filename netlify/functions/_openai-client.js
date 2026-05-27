@@ -10,7 +10,7 @@ export function getOpenAIClient() {
   return new OpenAI({ apiKey });
 }
 
-export const STORY_MODEL = 'gpt-4o-mini';
+export const STORY_MODEL = 'gpt-5.4-nano';
 export const IMAGE_MODEL = 'gpt-image-1';
 
 export const SCENE_JSON_SCHEMA = {
